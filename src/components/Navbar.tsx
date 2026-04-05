@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gamepad2, Menu, X } from "lucide-react";
+import { Gamepad2, Menu, X, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const navLinks = [
-  { label: "الرئيسية", href: "#hero" },
-  { label: "عن الصالة", href: "#about" },
-  { label: "المميزات", href: "#features" },
-  { label: "الأسعار", href: "#pricing" },
-  { label: "المعرض", href: "#gallery" },
-  { label: "تواصل معنا", href: "#contact" },
-];
+import { useI18n } from "@/lib/i18n";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const { t, toggle, lang } = useI18n();
+
+  const navLinks = [
+    { label: t("nav.home"), href: "#hero" },
+    { label: t("nav.about"), href: "#about" },
+    { label: t("nav.features"), href: "#features" },
+    { label: t("nav.pricing"), href: "#pricing" },
+    { label: t("nav.gallery"), href: "#gallery" },
+    { label: t("nav.faq"), href: "#faq" },
+    { label: t("nav.contact"), href: "#contact" },
+  ];
 
   return (
     <motion.nav
@@ -31,23 +34,32 @@ const Navbar = () => {
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
+            <a key={link.href} href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
               {link.label}
             </a>
           ))}
+          <button
+            onClick={toggle}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-secondary transition-colors"
+            aria-label="Toggle language"
+          >
+            <Globe className="h-4 w-4" />
+            {lang === "ar" ? "EN" : "عربي"}
+          </button>
           <Button asChild size="sm" className="glow-purple bg-primary hover:bg-primary/90">
-            <a href="#contact">احجز الآن</a>
+            <a href="#contact">{t("nav.book")}</a>
           </Button>
         </div>
 
         {/* Mobile toggle */}
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex md:hidden items-center gap-3">
+          <button onClick={toggle} className="text-muted-foreground hover:text-secondary transition-colors" aria-label="Toggle language">
+            <Globe className="h-5 w-5" />
+          </button>
+          <button className="text-foreground" onClick={() => setOpen(!open)}>
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -61,17 +73,12 @@ const Navbar = () => {
           >
             <div className="container mx-auto flex flex-col gap-4 py-4">
               {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
+                <a key={link.href} href={link.href} onClick={() => setOpen(false)} className="text-muted-foreground hover:text-primary transition-colors">
                   {link.label}
                 </a>
               ))}
               <Button asChild className="glow-purple bg-primary hover:bg-primary/90 w-full">
-                <a href="#contact" onClick={() => setOpen(false)}>احجز الآن</a>
+                <a href="#contact" onClick={() => setOpen(false)}>{t("nav.book")}</a>
               </Button>
             </div>
           </motion.div>
