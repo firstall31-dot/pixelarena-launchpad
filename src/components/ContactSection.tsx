@@ -1,12 +1,18 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Phone, MapPin, Clock, MessageCircle } from "lucide-react";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
+import { Phone, MapPin, Clock, MessageCircle, CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SectionWrapper from "./SectionWrapper";
 
@@ -27,16 +33,31 @@ const contactInfo = [
   { icon: Clock, label: "يومياً من 2 ظهراً - 2 صباحاً" },
 ];
 
+const timeSlots = [
+  "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM",
+  "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM",
+  "12:00 AM", "1:00 AM",
+];
+
 const ContactSection = () => {
+  const [selectedDate, setSelectedDate] = useState<Date>();
   const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    if (date) {
+      setValue("date", format(date, "yyyy-MM-dd"));
+    }
+  };
 
   const onSubmit = (data: FormData) => {
     const msg = `حجز جديد:\nالاسم: ${data.name}\nالهاتف: ${data.phone}\nالتاريخ: ${data.date}\nالوقت: ${data.time}\nالجهاز: ${data.device}\nالساعات: ${data.hours}`;
     const url = `https://wa.me/966512345678?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
     toast.success("تم إرسال طلب الحجز بنجاح!");
+    setSelectedDate(undefined);
     reset();
   };
 
@@ -65,14 +86,49 @@ const ContactSection = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Date Picker */}
             <div>
-              <Label htmlFor="date">التاريخ</Label>
-              <Input id="date" type="date" {...register("date")} className="mt-1 bg-muted/50 border-border" />
+              <Label>التاريخ</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full mt-1 justify-start bg-muted/50 border-border font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="ml-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "PPP", { locale: ar }) : "اختر التاريخ"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={handleDateSelect}
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
               {errors.date && <p className="text-destructive text-xs mt-1">{errors.date.message}</p>}
             </div>
+
+            {/* Time Picker */}
             <div>
-              <Label htmlFor="time">الوقت</Label>
-              <Input id="time" type="time" {...register("time")} className="mt-1 bg-muted/50 border-border" />
+              <Label>الوقت</Label>
+              <Select onValueChange={(v) => setValue("time", v)}>
+                <SelectTrigger className="mt-1 bg-muted/50 border-border">
+                  <SelectValue placeholder="اختر الوقت" />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeSlots.map((t) => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {errors.time && <p className="text-destructive text-xs mt-1">{errors.time.message}</p>}
             </div>
           </div>
@@ -131,7 +187,7 @@ const ContactSection = () => {
             ))}
           </div>
 
-          {/* Map placeholder */}
+          {/* Map */}
           <div className="glass rounded-xl overflow-hidden h-64">
             <iframe
               title="موقع بيكسل أرينا"

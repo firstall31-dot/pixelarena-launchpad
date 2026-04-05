@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Particles from "./Particles";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
@@ -9,13 +10,16 @@ const HeroSection = () => {
       {/* Background */}
       <img
         src={heroBg}
-        alt="بيكسل أرينا - صالة ألعاب"
+        alt="PixelArena - Gaming Lounge"
         width={1920}
         height={1080}
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-background/80" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/60" />
+
+      {/* Particles */}
+      <Particles />
 
       {/* Floating neon orbs */}
       <motion.div
