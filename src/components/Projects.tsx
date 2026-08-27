@@ -98,6 +98,11 @@ export function Projects() {
           <Reveal delay={0.1}>
             <div className="relative">
               <div className="absolute -inset-6 -z-10 ambient rounded-[2rem] opacity-70" />
+
+              {/* stacked layers behind the window */}
+              <div className="pointer-events-none absolute -top-4 left-6 right-6 h-16 rounded-t-[1.4rem] bg-white/10" />
+              <div className="pointer-events-none absolute -top-2 left-3 right-3 h-16 rounded-t-[1.6rem] bg-white/[0.16]" />
+
               <AnimatePresence mode="wait">
                 <motion.article
                   key={current.id}
@@ -105,55 +110,75 @@ export function Projects() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="glass overflow-hidden rounded-3xl shadow-[var(--shadow-deep)]"
+                  className="relative overflow-hidden rounded-[1.6rem] bg-white text-[#111] shadow-[var(--shadow-deep)] ring-1 ring-black/10"
                 >
-                  <div className="relative h-44 md:h-56" style={{ background: current.accent }}>
-                    <div className="grid-lines absolute inset-0 opacity-40" />
-                    <div className="absolute inset-0 flex items-end justify-between p-5">
-                      <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] text-white/85 backdrop-blur-md">
-                        {current.category}
-                      </span>
-                      <span className="mono-label text-white/60">Case study</span>
-                    </div>
-                  </div>
+                  <div className="grid md:grid-cols-2">
+                    {/* left pane */}
+                    <div className="border-b border-black/[0.07] p-5 md:border-b-0 md:border-r md:p-6">
+                      <div className="flex items-center gap-2 text-[11px] text-black/50">
+                        <ArrowUpRight className="h-3.5 w-3.5 -rotate-135" />
+                        <span className="h-4 w-4 rounded-full" style={{ background: current.accent }} />
+                        <span className="font-medium text-black/70">{current.category}</span>
+                      </div>
 
-                  <div className="p-6 md:p-8">
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="text-xl font-semibold md:text-2xl">{current.title}</h3>
+                      <p className="mt-6 text-[11px] text-black/45">{current.title.split("—")[0].trim()}</p>
+                      <p className="mt-1 text-xl font-semibold tracking-tight">
+                        {current.metrics[0].value}
+                      </p>
+
+                      <div
+                        className="mt-4 aspect-square w-full rounded-md"
+                        style={{ background: current.accent }}
+                      >
+                        <div className="grid-lines h-full w-full rounded-md opacity-30" />
+                      </div>
+
+                      <div className="mt-4 flex items-center gap-1.5 text-[9px] text-black/40">
+                        <span>Powered by</span>
+                        <span className="font-semibold text-black/70">{current.tech[0]}</span>
+                        <span className="ml-auto">Terms · Privacy</span>
+                      </div>
+                    </div>
+
+                    {/* right pane */}
+                    <div className="p-5 md:p-6">
+                      <p className="text-[11px] font-medium text-black/70">Project overview</p>
+
+                      <div className="mt-3 space-y-2 rounded-md border border-black/[0.08] p-3">
+                        {current.metrics.map((m) => (
+                          <div key={m.label} className="flex items-start justify-between gap-3">
+                            <span className="text-[10px] uppercase tracking-wider text-black/40">
+                              {m.label}
+                            </span>
+                            <span className="text-[11px] font-medium text-black/80">{m.value}</span>
+                          </div>
+                        ))}
+                        <div className="flex items-start justify-between gap-3 border-t border-black/[0.06] pt-2">
+                          <span className="text-[10px] uppercase tracking-wider text-black/40">Stack</span>
+                          <span className="max-w-[60%] text-right text-[11px] leading-snug text-black/70">
+                            {current.tech.join(", ")}
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className="mt-3 line-clamp-3 text-[11px] leading-relaxed text-black/50">
+                        {current.description}
+                      </p>
+
                       <a
                         href="#contact"
-                        aria-label={`Discuss ${current.title}`}
-                        className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-[var(--surface-2)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--brand)]"
+                        className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-md bg-[#111] text-[12px] font-medium text-white transition-opacity hover:opacity-90"
                       >
-                        <ArrowUpRight className="h-4 w-4" />
+                        Discuss this project
+                        <ArrowUpRight className="h-3.5 w-3.5" />
                       </a>
-                    </div>
-
-                    <div className="mt-6 grid grid-cols-3 gap-3 rounded-2xl border border-border p-4">
-                      {current.metrics.map((m) => (
-                        <div key={m.label}>
-                          <div className="brand-text text-base font-bold md:text-lg">{m.value}</div>
-                          <div className="mt-1 text-[10.5px] uppercase tracking-wider text-muted-foreground">
-                            {m.label}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-5 flex flex-wrap gap-1.5">
-                      {current.tech.map((t) => (
-                        <span
-                          key={t}
-                          className="rounded-md border border-border px-2 py-0.5 text-[11px] text-muted-foreground"
-                        >
-                          {t}
-                        </span>
-                      ))}
+                      <p className="mt-2 text-center text-[10px] text-black/40">View full case study</p>
                     </div>
                   </div>
                 </motion.article>
               </AnimatePresence>
             </div>
+
           </Reveal>
         </div>
       </div>
